@@ -3,7 +3,7 @@ import { useFilters } from "@/contexts/FilterContext";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { exportDashboardToExcel, exportDashboardToPdf } from "@/lib/dashboardExport";
-import { Download, FileSpreadsheet, FileText, LayoutGrid, Menu } from "lucide-react";
+import { Download, FileSpreadsheet, FileText, Menu } from "lucide-react";
 import { useState } from "react";
 import { toast } from "@/hooks/use-toast";
 import { Link, useLocation } from "react-router-dom";
@@ -47,7 +47,7 @@ export function DashboardHeader() {
       {/* Top Bar matching ServiceNow */}
       <div className="flex items-center gap-3 px-2 py-2 border-b border-border/50 text-sm text-foreground/80">
         <Menu className="h-4 w-4 text-foreground/70" />
-        <LayoutGrid className="h-4 w-4 text-foreground/70" />
+        <img src="/favicon.svg" alt="Novartis Logo" className="h-5 w-5" />
         <span className="font-semibold text-foreground">Novartis ITSE Dashboard</span>
 
         {/* Right side items */}

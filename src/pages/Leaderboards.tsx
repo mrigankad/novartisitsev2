@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { ChevronDown, ChevronUp, Users } from "lucide-react";
+import { ChevronDown, ChevronUp } from "lucide-react";
 import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
 
 import { DrillDownModal } from "@/components/dashboard/DrillDownModal";
@@ -148,8 +148,8 @@ export default function Leaderboards() {
             {/* Professional Integrated Toolbar */}
             <div className="bg-gradient-to-r from-slate-100 to-slate-50 border-b border-slate-300 px-6 py-4 flex items-center justify-between">
               <div className="flex items-center gap-4">
-                <div className="bg-[hsl(152,79%,20%)] p-2 rounded-md text-white shadow-md transition-transform hover:scale-105">
-                  <Users className="h-4 w-4" />
+                <div className="bg-[hsl(152,79%,20%)] p-1.5 rounded-md text-white shadow-md transition-transform hover:scale-105">
+                  <img src="/favicon.svg" alt="Novartis" className="h-5 w-5 brightness-0 invert" />
                 </div>
                 <div className="flex flex-col">
                   <h2 className="text-xl font-black text-slate-800 tracking-tight leading-none">Leaderboard Summary</h2>

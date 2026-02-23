@@ -36,13 +36,19 @@ const mapPriority = (p: string): "P1" | "P2" | "P3" | "P4" => {
     return "P4";
 };
 
-const extractRegion = (regionStr: string): "na" | "emea" | "apac" | "latam" | "Other" => {
-    if (!regionStr) return "Other";
-    const lower = regionStr.toLowerCase();
-    if (lower.includes("europe")) return "emea";
-    if (lower.includes("america")) return "na";
-    if (lower.includes("asia") || lower.includes("apac")) return "apac";
-    if (lower.includes("latam")) return "latam";
+const extractRegion = (regionStr: string, countryStr: string = ""): "na" | "emea" | "apac" | "latam" | "Other" => {
+    const rLower = (regionStr || "").toLowerCase();
+    const cLower = (countryStr || "").toLowerCase();
+
+    // Check specific LATAM countries first if it's in Americas or matches known LATAM countries
+    if (rLower.includes("latam") || cLower.includes("mexico") || cLower.includes("brazil") || cLower.includes("argentina") || cLower.includes("colombia")) {
+        return "latam";
+    }
+
+    if (rLower.includes("europe") || rLower.includes("emea")) return "emea";
+    if (rLower.includes("asia") || rLower.includes("apac") || rLower.includes("amea")) return "apac";
+    if (rLower.includes("america") || rLower.includes("na")) return "na";
+
     return "Other";
 };
 
@@ -55,7 +61,6 @@ const calculateAge = (createdStr: string, resolvedStr?: string): string => {
 };
 
 let allTickets: Ticket[] = [];
-let kpiData: any = {};
 let initPromise: Promise<void> | null = null;
 
 function mapRecordToTicket(r: any): Ticket {
@@ -85,7 +90,7 @@ function mapRecordToTicket(r: any): Ticket {
         created: r.Opened,
         age: calculateAge(r.Opened, r.Resolved),
         assignmentGroup: r["Assignment Group"] || "Unassigned",
-        region: extractRegion(r.Region),
+        region: extractRegion(r.Region, r["Business Owner Country"]),
         businessUnit: r["Business Unit (Division)"] || "Other",
         resolved: resolvedHours ? `${resolvedHours} hrs` : undefined,
         resolvedAt: r.Resolved,
@@ -130,7 +135,6 @@ export async function ensureRealDataLoaded() {
                 await idbSet(KPI_CACHE_KEY, kpis);
             }
 
-            kpiData = kpis ?? {};
             allTickets = (incidents ?? []).map(mapRecordToTicket);
         })();
     }
@@ -337,11 +341,11 @@ export function getTicketInflowTrend(tickets: Ticket[], dateRange: string = "30d
             let key: string;
 
             if (useHourly) {
-                 key = d.toISOString().substring(0, 13); // YYYY-MM-DDTHH
+                key = d.toISOString().substring(0, 13); // YYYY-MM-DDTHH
             } else if (useMonthly) {
-                 key = d.toISOString().substring(0, 7); // YYYY-MM
+                key = d.toISOString().substring(0, 7); // YYYY-MM
             } else {
-                 key = d.toISOString().substring(0, 10); // YYYY-MM-DD
+                key = d.toISOString().substring(0, 10); // YYYY-MM-DD
             }
 
             if (!groups[key]) {
@@ -355,11 +359,11 @@ export function getTicketInflowTrend(tickets: Ticket[], dateRange: string = "30d
     return Object.entries(groups).map(([key, data]) => {
         let dateLabel = "";
         if (useHourly) {
-             dateLabel = data.dateObj.toLocaleTimeString("en-US", { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: "UTC" });
+            dateLabel = data.dateObj.toLocaleTimeString("en-US", { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: "UTC" });
         } else if (useMonthly) {
-             dateLabel = data.dateObj.toLocaleDateString("en-US", { year: "numeric", month: "short", timeZone: "UTC" });
+            dateLabel = data.dateObj.toLocaleDateString("en-US", { year: "numeric", month: "short", timeZone: "UTC" });
         } else {
-             dateLabel = data.dateObj.toLocaleDateString("en-US", { year: 'numeric', month: 'short', day: 'numeric', timeZone: "UTC" });
+            dateLabel = data.dateObj.toLocaleDateString("en-US", { year: 'numeric', month: 'short', day: 'numeric', timeZone: "UTC" });
         }
         return {
             date: dateLabel,
@@ -399,11 +403,11 @@ export function getMTTRTrend(tickets: Ticket[], dateRange: string = "30d") {
             let key: string;
 
             if (useHourly) {
-                 key = d.toISOString().substring(0, 13);
+                key = d.toISOString().substring(0, 13);
             } else if (useMonthly) {
-                 key = d.toISOString().substring(0, 7);
+                key = d.toISOString().substring(0, 7);
             } else {
-                 key = d.toISOString().substring(0, 10);
+                key = d.toISOString().substring(0, 10);
             }
 
             const hours = parseFloat(t.resolved?.split(" ")[0] || "0");
@@ -420,13 +424,13 @@ export function getMTTRTrend(tickets: Ticket[], dateRange: string = "30d") {
     return Object.entries(groups).map(([key, data]) => {
         let dateLabel = "";
         if (useHourly) {
-             dateLabel = data.dateObj.toLocaleTimeString("en-US", { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: "UTC" });
+            dateLabel = data.dateObj.toLocaleTimeString("en-US", { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: "UTC" });
         } else if (useMonthly) {
-             dateLabel = data.dateObj.toLocaleDateString("en-US", { year: "numeric", month: "short", timeZone: "UTC" });
+            dateLabel = data.dateObj.toLocaleDateString("en-US", { year: "numeric", month: "short", timeZone: "UTC" });
         } else {
-             dateLabel = data.dateObj.toLocaleDateString("en-US", { year: 'numeric', month: 'short', day: 'numeric', timeZone: "UTC" });
+            dateLabel = data.dateObj.toLocaleDateString("en-US", { year: 'numeric', month: 'short', day: 'numeric', timeZone: "UTC" });
         }
-        
+
         return {
             date: dateLabel,
             fullDate: key,
@@ -466,11 +470,11 @@ export function getBacklogTrend(tickets: Ticket[], dateRange: string = "30d") {
                 let key: string;
 
                 if (useHourly) {
-                     key = d.toISOString().substring(0, 13);
+                    key = d.toISOString().substring(0, 13);
                 } else if (useMonthly) {
-                     key = d.toISOString().substring(0, 7);
+                    key = d.toISOString().substring(0, 7);
                 } else {
-                     key = d.toISOString().substring(0, 10);
+                    key = d.toISOString().substring(0, 10);
                 }
 
                 if (!groups[key]) {
@@ -483,13 +487,13 @@ export function getBacklogTrend(tickets: Ticket[], dateRange: string = "30d") {
     });
 
     return Object.entries(groups).map(([key, data]) => {
-         let dateLabel = "";
+        let dateLabel = "";
         if (useHourly) {
-             dateLabel = data.dateObj.toLocaleTimeString("en-US", { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: "UTC" });
+            dateLabel = data.dateObj.toLocaleTimeString("en-US", { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: "UTC" });
         } else if (useMonthly) {
-             dateLabel = data.dateObj.toLocaleDateString("en-US", { year: "numeric", month: "short", timeZone: "UTC" });
+            dateLabel = data.dateObj.toLocaleDateString("en-US", { year: "numeric", month: "short", timeZone: "UTC" });
         } else {
-             dateLabel = data.dateObj.toLocaleDateString("en-US", { year: 'numeric', month: 'short', day: 'numeric', timeZone: "UTC" });
+            dateLabel = data.dateObj.toLocaleDateString("en-US", { year: 'numeric', month: 'short', day: 'numeric', timeZone: "UTC" });
         }
 
         return {
