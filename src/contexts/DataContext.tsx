@@ -51,8 +51,24 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
 
   if (!ready) {
     return (
-      <div className="min-h-screen bg-dashboard-bg text-foreground flex items-center justify-center">
-        <div className="text-sm text-muted-foreground">Loading data…</div>
+      <div className="min-h-screen bg-white flex flex-col items-center justify-center relative">
+        <div className="flex flex-col items-center">
+          <img
+            src="/src/assets/Logo.svg"
+            alt="Novartis Logo"
+            className="h-24 w-24 mb-6 animate-pulse"
+          />
+          <div className="flex flex-col items-center gap-2">
+            <span className="text-[10px] font-black text-slate-400 uppercase tracking-[0.4em] ml-[0.4em]">
+              Loading
+            </span>
+            <div className="flex gap-1.5 mt-2">
+              <div className="w-1.5 h-1.5 rounded-full bg-[hsl(152,79%,20%)] animate-bounce [animation-delay:-0.3s]" />
+              <div className="w-1.5 h-1.5 rounded-full bg-[hsl(152,79%,20%)] animate-bounce [animation-delay:-0.15s]" />
+              <div className="w-1.5 h-1.5 rounded-full bg-[hsl(152,79%,20%)] animate-bounce" />
+            </div>
+          </div>
+        </div>
       </div>
     );
   }
@@ -65,4 +81,3 @@ export function useData() {
   if (!ctx) throw new Error("useData must be used within DataProvider");
   return ctx;
 }
-
