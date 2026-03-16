@@ -20,8 +20,8 @@ export function SLATrackingChart() {
     const { filters } = useFilters();
     const [drillDownOpen, setDrillDownOpen] = useState(false);
     const [selectedPriority, setSelectedPriority] = useState<string | null>(null);
-    const [slaStatusFilter, setSlaStatusFilter] = useState<"all" | "met" | "breached">("all");
-    const [drilldownSlaStatus, setDrilldownSlaStatus] = useState<"all" | "met" | "breached">("all");
+    const [slaStatusFilter, setSlaStatusFilter] = useState<"all" | "met" | "breached" | "na">("all");
+    const [drilldownSlaStatus, setDrilldownSlaStatus] = useState<"all" | "met" | "breached" | "na">("all");
 
     const filteredTickets = useMemo(() => getFilteredTickets(filters), [filters]);
     const data = useMemo(() => getSLATracking(filteredTickets), [filteredTickets]);
@@ -48,7 +48,7 @@ export function SLATrackingChart() {
         }
     };
 
-    const handleCardClick = (priority: string, status: "met" | "breached") => {
+    const handleCardClick = (priority: string, status: "met" | "breached" | "na") => {
         setSelectedPriority(priority);
         setDrilldownSlaStatus(status);
         setDrillDownOpen(true);
@@ -62,15 +62,18 @@ export function SLATrackingChart() {
                 if (drilldownSlaStatus === "all") return true;
                 return t.slaStatus === drilldownSlaStatus;
             })
-            .map(t => ({
-                ticketId: t.ticketId,
+            .map(t => ({ticketId: t.ticketId,
                 title: t.title,
                 priority: t.priority,
                 status: t.status,
                 slaStatus: t.slaStatus,
                 assignee: t.assignee,
                 created: t.created,
-            }));
+        resolvedAt: t.resolvedAt || "-",
+        resolved: t.resolved ? t.resolved : "-",
+        createdBy: t.createdBy || "-",
+        closedBy: t.closedBy || "-"
+      }));
     }, [selectedPriority, drilldownSlaStatus, filteredTickets]);
 
     return (
@@ -86,6 +89,7 @@ export function SLATrackingChart() {
                     <ToggleGroupItem value="all">All</ToggleGroupItem>
                     <ToggleGroupItem value="met">SLA Met</ToggleGroupItem>
                     <ToggleGroupItem value="breached">SLA Breached</ToggleGroupItem>
+                    <ToggleGroupItem value="na">N/A</ToggleGroupItem>
                 </ToggleGroup>
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
@@ -97,10 +101,14 @@ export function SLATrackingChart() {
                         title="Click to view tickets"
                     >
                         <div className="text-xs text-muted-foreground font-medium mb-1">
-                            {item.priority} {slaStatusFilter === "breached" ? "SLA Breached" : "SLA Met"}
+                            {item.priority} {slaStatusFilter === "breached" ? "SLA Breached" : slaStatusFilter === "na" ? "SLA N/A" : "SLA Met"}
                         </div>
                         <div className="text-lg font-bold text-foreground">
-                            {slaStatusFilter === "breached" ? item.breached.toLocaleString() : `${item.metRate}%`}
+                            {slaStatusFilter === "breached" 
+                                ? item.breached.toLocaleString() 
+                                : slaStatusFilter === "na" 
+                                    ? (item.na || 0).toLocaleString()
+                                    : item.metRate}
                         </div>
                         {slaStatusFilter === "all" && (
                             <div className="text-[10px] text-muted-foreground mt-1">
@@ -123,6 +131,20 @@ export function SLATrackingChart() {
                                 >
                                     {item.breached} breached
                                 </span>
+                                {(item.na || 0) > 0 && (
+                                    <>
+                                        {" / "}
+                                        <span
+                                            className="hover:text-muted-foreground/80 transition-colors"
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                handleCardClick(item.priority, "na");
+                                            }}
+                                        >
+                                            {item.na} n/a
+                                        </span>
+                                    </>
+                                )}
                             </div>
                         )}
                     </div>
@@ -194,16 +216,21 @@ export function SLATrackingChart() {
                         <ToggleGroupItem value="all">All</ToggleGroupItem>
                         <ToggleGroupItem value="met">SLA Met</ToggleGroupItem>
                         <ToggleGroupItem value="breached">SLA Breached</ToggleGroupItem>
+                        <ToggleGroupItem value="na">N/A</ToggleGroupItem>
                     </ToggleGroup>
                 }
                 columns={[
-                    { key: "ticketId", label: "Ticket ID" },
+          { key: "ticketId", label: "Ticket ID" },
                     { key: "priority", label: "Priority" },
                     { key: "status", label: "Status" },
                     { key: "slaStatus", label: "SLA Status" },
                     { key: "assignee", label: "Assigned To" },
                     { key: "created", label: "Created" },
-                ]}
+          { key: "resolvedAt", label: "Resolved At" },
+          { key: "resolved", label: "Time Taken" },
+          { key: "createdBy", label: "Created By" },
+          { key: "closedBy", label: "Closed By" }
+        ]}
             />
         </div>
     );

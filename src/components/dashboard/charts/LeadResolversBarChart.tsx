@@ -49,14 +49,17 @@ export function LeadResolversBarChart() {
     const drillDownData = useMemo(() => {
         if (!selectedResolver) return [];
         return tickets.filter(t => t.resolver === selectedResolver)
-            .map(t => ({
-                ticketId: t.ticketId,
+            .map(t => ({ticketId: t.ticketId,
                 title: t.title,
                 priority: t.priority,
                 status: t.status,
                 assignee: t.assignee,
                 created: t.created,
-            }));
+        resolvedAt: t.resolvedAt || "-",
+        resolved: t.resolved ? t.resolved : "-",
+        createdBy: t.createdBy || "-",
+        closedBy: t.closedBy || "-"
+      }));
     }, [selectedResolver, tickets]);
 
     return (
@@ -107,12 +110,16 @@ export function LeadResolversBarChart() {
                 title={`Tickets resolved by ${selectedResolver}`}
                 data={drillDownData}
                 columns={[
-                    { key: "ticketId", label: "Ticket ID" },
+          { key: "ticketId", label: "Ticket ID" },
                     { key: "priority", label: "Priority" },
                     { key: "status", label: "Status" },
                     { key: "assignee", label: "Assigned To" },
                     { key: "created", label: "Created" },
-                ]}
+          { key: "resolvedAt", label: "Resolved At" },
+          { key: "resolved", label: "Time Taken" },
+          { key: "createdBy", label: "Created By" },
+          { key: "closedBy", label: "Closed By" }
+        ]}
             />
         </>
     );

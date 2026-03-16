@@ -60,13 +60,16 @@ export function AgeingBucketsChart() {
                !["Resolved", "Closed"].includes(t.status) &&
                age >= minAge && age <= maxAge;
       })
-      .map(t => ({
-        ticketId: t.ticketId,
+      .map(t => ({ticketId: t.ticketId,
         title: t.title,
         priority: t.priority,
         age: t.age,
         status: t.status,
         assignee: t.assignee,
+        resolvedAt: t.resolvedAt || "-",
+        resolved: t.resolved ? t.resolved : "-",
+        createdBy: t.createdBy || "-",
+        closedBy: t.closedBy || "-"
       }));
   }, [selectedBucket, selectedPriority, filteredTickets]);
 
@@ -155,6 +158,10 @@ export function AgeingBucketsChart() {
           { key: "age", label: "Age" },
           { key: "status", label: "Status" },
           { key: "assignee", label: "Assigned To" },
+          { key: "resolvedAt", label: "Resolved At" },
+          { key: "resolved", label: "Time Taken" },
+          { key: "createdBy", label: "Created By" },
+          { key: "closedBy", label: "Closed By" }
         ]}
       />
     </>

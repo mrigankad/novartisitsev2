@@ -49,14 +49,18 @@ export function BacklogByAssignedToChart() {
 
     const drillDownData = useMemo(() => {
         if (!selectedAssignee) return [];
-        return filteredTickets.filter(t => t.assignee === selectedAssignee).map(t => ({
-            ticketId: t.ticketId,
+        return filteredTickets.filter(t => t.assignee === selectedAssignee).map(t => ({ticketId: t.ticketId,
             title: t.title,
             priority: t.priority,
             status: t.status,
             group: t.assignmentGroup,
             created: t.created,
-        }));
+        resolvedAt: t.resolvedAt || "-",
+        resolved: t.resolved ? t.resolved : "-",
+        createdBy: t.createdBy || "-",
+        closedBy: t.closedBy || "-",
+        assignee: t.assignee || "-"
+      }));
     }, [selectedAssignee, filteredTickets]);
 
     return (
@@ -145,12 +149,17 @@ export function BacklogByAssignedToChart() {
                 title={`Backlog for ${selectedAssignee || ""}`}
                 data={drillDownData}
                 columns={[
-                    { key: "ticketId", label: "Ticket ID" },
+          { key: "ticketId", label: "Ticket ID" },
                     { key: "group", label: "Group" },
                     { key: "priority", label: "Priority" },
                     { key: "status", label: "Status" },
                     { key: "created", label: "Created" },
-                ]}
+          { key: "resolvedAt", label: "Resolved At" },
+          { key: "resolved", label: "Time Taken" },
+          { key: "assignee", label: "Assigned To" },
+          { key: "createdBy", label: "Created By" },
+          { key: "closedBy", label: "Closed By" }
+        ]}
             />
         </>
     );

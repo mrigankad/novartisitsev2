@@ -91,12 +91,15 @@ export default function Leaderboards() {
       if (isReopened(t)) existing.reopened += 1;
       const hops = coerceNumber(t.reassignmentCount) ?? 0;
       if (hops >= 3) existing.highHop += 1;
-      if (t.slaStatus === "met") existing.slaMet += 1;
+      // Only count tickets that have SLA tracking (exclude P1/P2 with "na" status)
+      if (t.slaStatus !== "na" && t.slaStatus === "met") existing.slaMet += 1;
       by.set(name, existing);
     }
 
     const prepared = Array.from(by.values()).map((r) => {
-      const slaMetRate = r.total > 0 ? (r.slaMet / r.total) * 100 : 0;
+      // Count tickets that have SLA tracking (not "na")
+      const slaTrackedCount = r.tickets.filter(t => t.slaStatus !== "na").length;
+      const slaMetRate = slaTrackedCount > 0 ? (r.slaMet / slaTrackedCount) * 100 : 0;
       return { ...r, slaMetRate: Number(slaMetRate.toFixed(1)) };
     });
 

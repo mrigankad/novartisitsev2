@@ -118,6 +118,9 @@ export function TicketInflowChart() {
           { key: "priority", label: "Priority" },
           { key: "status", label: "Status" },
           { key: "created", label: "Created" },
+          { key: "assignee", label: "Assigned To" },
+          { key: "createdBy", label: "Created By" },
+          { key: "closedBy", label: "Closed By" }
         ]}
       />
     </>

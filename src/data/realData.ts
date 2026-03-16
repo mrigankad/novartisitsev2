@@ -19,9 +19,11 @@ export interface Ticket {
     resolved?: string; // numeric part for hours
     resolvedAt?: string; // ISO date string
     resolver?: string;
-    slaStatus: "met" | "breached";
+    slaStatus: "met" | "breached" | "na";
     reopenCount?: number;
     reassignmentCount?: number;
+    createdBy?: string;
+    closedBy?: string;
 }
 
 const INCIDENT_CACHE_KEY = "incident-data:v1";
@@ -70,14 +72,17 @@ function mapRecordToTicket(r: any): Ticket {
     // Resolve time in hours (from seconds)
     const resolvedHours = r["Resolve time"] ? (r["Resolve time"] / 3600).toFixed(1) : undefined;
 
-    // SLA status - mocking it based on priority and resolve time as it's not in the data
-    // P1 < 4h, P2 < 8h, P3 < 24h, P4 < 48h (Example rules)
-    let slaStatus: "met" | "breached" = "met";
-    if (resolvedHours) {
+    // SLA status based on Resolution Time per SERVICENOW SLA:
+    // P1: NA (no SLA tracking)
+    // P2: NA (no SLA tracking)
+    // P3: 95% in 24 Hours
+    // P4: 95% in 48 Hours
+    let slaStatus: "met" | "breached" | "na" = "met";
+    if (priority === "P1" || priority === "P2") {
+        slaStatus = "na";
+    } else if (resolvedHours) {
         const hours = parseFloat(resolvedHours);
-        if (priority === "P1" && hours > 4) slaStatus = "breached";
-        else if (priority === "P2" && hours > 8) slaStatus = "breached";
-        else if (priority === "P3" && hours > 24) slaStatus = "breached";
+        if (priority === "P3" && hours > 24) slaStatus = "breached";
         else if (priority === "P4" && hours > 48) slaStatus = "breached";
     }
 
@@ -98,6 +103,8 @@ function mapRecordToTicket(r: any): Ticket {
         slaStatus,
         reopenCount: r["Reopen count"],
         reassignmentCount: r["Reassignment count"],
+        createdBy: r["Created by"],
+        closedBy: r["Closed by"] || r["Resolved by"],
     };
 }
 
@@ -243,8 +250,11 @@ export function calculateKPIs(tickets: Ticket[]) {
     }).length;
     const reopenRate = totalTickets > 0 ? ((reopenedTickets / totalTickets) * 100).toFixed(2) : "0.0";
 
-    const metSla = tickets.filter(t => t.slaStatus === "met").length;
-    const slaMetRate = totalTickets > 0 ? ((metSla / totalTickets) * 100).toFixed(1) : "0.0";
+    // SLA calculation: only count tickets that have SLA tracking (P3, P4)
+    // P1 and P2 have "na" status and are excluded from SLA rate calculation
+    const slaTrackedTickets = tickets.filter(t => t.slaStatus !== "na");
+    const metSla = slaTrackedTickets.filter(t => t.slaStatus === "met").length;
+    const slaMetRate = slaTrackedTickets.length > 0 ? ((metSla / slaTrackedTickets.length) * 100).toFixed(1) : "0.0";
 
     const highHopTickets = tickets.filter((t) => {
         const hops = coerceNumber(t.reassignmentCount) ?? 0;
@@ -299,14 +309,21 @@ export function getSLATracking(tickets: Ticket[]) {
 
     return priorities.map(p => {
         const pTickets = tickets.filter(t => t.priority === p);
+        // P1 and P2 have NA status - no SLA tracking
+        const na = pTickets.filter(t => t.slaStatus === "na").length;
         const met = pTickets.filter(t => t.slaStatus === "met").length;
         const breached = pTickets.filter(t => t.slaStatus === "breached").length;
+
+        // For SLA rate calculation, only consider tickets that are tracked (not NA)
+        const trackedTickets = pTickets.length - na;
+        const metRate = trackedTickets > 0 ? ((met / trackedTickets) * 100).toFixed(1) : "N/A";
 
         return {
             priority: p,
             met,
             breached,
-            metRate: pTickets.length > 0 ? ((met / pTickets.length) * 100).toFixed(1) : "0.0"
+            na,
+            metRate
         };
     });
 }

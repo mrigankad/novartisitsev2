@@ -61,14 +61,16 @@ export function TotalTicketsDonutChart() {
           return t.status === "Resolved" || t.status === "Closed";
         }
       })
-      .map(t => ({
-        ticketId: t.ticketId,
+      .map(t => ({ticketId: t.ticketId,
         title: t.title,
         priority: t.priority,
         status: t.status,
         assignee: t.assignee,
         created: t.created,
-        resolved: t.resolved || "-",
+        resolvedAt: t.resolvedAt || "-",
+        resolved: t.resolved ? t.resolved : "-",
+        createdBy: t.createdBy || "-",
+        closedBy: t.closedBy || "-"
       }));
   }, [selectedStatus, filteredTickets]);
 
@@ -155,7 +157,10 @@ export function TotalTicketsDonutChart() {
           { key: "status", label: "Status" },
           { key: "assignee", label: "Assigned To" },
           { key: "created", label: "Created" },
-          { key: "resolved", label: "Resolved" },
+          { key: "resolvedAt", label: "Resolved At" },
+          { key: "resolved", label: "Time Taken" },
+          { key: "createdBy", label: "Created By" },
+          { key: "closedBy", label: "Closed By" }
         ]}
       />
     </>

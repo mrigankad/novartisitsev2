@@ -248,6 +248,8 @@ export function SLAToBeBreachedChart() {
           { key: "age", label: "Age" },
           { key: "hoursRemaining", label: "Hours Remaining" },
           { key: "riskLevel", label: "Risk Level" },
+          { key: "createdBy", label: "Created By" },
+          { key: "closedBy", label: "Closed By" }
         ]}
       />
     </>

@@ -43,12 +43,15 @@ export function MTTRByPriorityChart() {
     if (!selectedPriority) return [];
     return filteredTickets
       .filter((t) => t.priority === selectedPriority && !!t.resolved)
-      .map(t => ({
-        ticketId: t.ticketId,
+      .map(t => ({ticketId: t.ticketId,
         title: t.title,
-        resolved: t.resolved || "-",
         resolver: t.resolver || "-",
         status: t.status,
+        resolvedAt: t.resolvedAt || "-",
+        resolved: t.resolved ? t.resolved : "-",
+        createdBy: t.createdBy || "-",
+        closedBy: t.closedBy || "-",
+        assignee: t.assignee || "-"
       }));
   }, [selectedPriority, filteredTickets]);
 
@@ -121,9 +124,13 @@ export function MTTRByPriorityChart() {
         data={drillDownData}
         columns={[
           { key: "ticketId", label: "Ticket ID" },
-          { key: "resolved", label: "Resolution Time" },
           { key: "resolver", label: "Resolver" },
           { key: "status", label: "Status" },
+          { key: "resolvedAt", label: "Resolved At" },
+          { key: "resolved", label: "Time Taken" },
+          { key: "assignee", label: "Assigned To" },
+          { key: "createdBy", label: "Created By" },
+          { key: "closedBy", label: "Closed By" }
         ]}
       />
     </>

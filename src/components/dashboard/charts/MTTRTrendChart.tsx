@@ -164,12 +164,15 @@ export function MTTRTrendChart() {
                 title={`Resolved Tickets on ${selectedLabel || ""}`}
                 data={drillDownData}
                 columns={[
-                    { key: "ticketId", label: "Ticket ID" },
+          { key: "ticketId", label: "Ticket ID" },
                     { key: "priority", label: "Priority" },
                     { key: "status", label: "Status" },
                     { key: "resolved", label: "MTTR" },
                     { key: "created", label: "Created" },
-                ]}
+          { key: "assignee", label: "Assigned To" },
+          { key: "createdBy", label: "Created By" },
+          { key: "closedBy", label: "Closed By" }
+        ]}
             />
         </>
     );

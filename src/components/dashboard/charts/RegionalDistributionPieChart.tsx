@@ -59,14 +59,17 @@ export function RegionalDistributionPieChart() {
     const drillDownData = useMemo(() => {
         if (!selectedRegion) return [];
         return tickets.filter(t => t.region.toUpperCase() === selectedRegion)
-            .map(t => ({
-                ticketId: t.ticketId,
+            .map(t => ({ticketId: t.ticketId,
                 title: t.title,
                 priority: t.priority,
                 status: t.status,
                 assignee: t.assignee,
                 created: t.created,
-            }));
+        resolvedAt: t.resolvedAt || "-",
+        resolved: t.resolved ? t.resolved : "-",
+        createdBy: t.createdBy || "-",
+        closedBy: t.closedBy || "-"
+      }));
     }, [selectedRegion, tickets]);
 
     return (
@@ -116,12 +119,16 @@ export function RegionalDistributionPieChart() {
                 title={`${selectedRegion} Tickets`}
                 data={drillDownData}
                 columns={[
-                    { key: "ticketId", label: "Ticket ID" },
+          { key: "ticketId", label: "Ticket ID" },
                     { key: "priority", label: "Priority" },
                     { key: "status", label: "Status" },
                     { key: "assignee", label: "Assigned To" },
                     { key: "created", label: "Created" },
-                ]}
+          { key: "resolvedAt", label: "Resolved At" },
+          { key: "resolved", label: "Time Taken" },
+          { key: "createdBy", label: "Created By" },
+          { key: "closedBy", label: "Closed By" }
+        ]}
             />
         </>
     );

@@ -50,12 +50,15 @@ export function PriorityDistributionChart() {
     const priorityKey = selectedPriority.split(" ")[0] as "P1" | "P2" | "P3" | "P4";
     return filteredTickets
       .filter((t) => t.priority === priorityKey)
-      .map(t => ({
-        ticketId: t.ticketId,
+      .map(t => ({ticketId: t.ticketId,
         title: t.title,
         status: t.status,
         assignee: t.assignee,
         created: t.created,
+        resolvedAt: t.resolvedAt || "-",
+        resolved: t.resolved ? t.resolved : "-",
+        createdBy: t.createdBy || "-",
+        closedBy: t.closedBy || "-"
       }));
   }, [selectedPriority, filteredTickets]);
 
@@ -130,6 +133,10 @@ export function PriorityDistributionChart() {
           { key: "status", label: "Status" },
           { key: "assignee", label: "Assigned To" },
           { key: "created", label: "Created" },
+          { key: "resolvedAt", label: "Resolved At" },
+          { key: "resolved", label: "Time Taken" },
+          { key: "createdBy", label: "Created By" },
+          { key: "closedBy", label: "Closed By" }
         ]}
       />
     </>

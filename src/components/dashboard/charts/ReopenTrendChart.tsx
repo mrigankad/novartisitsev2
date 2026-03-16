@@ -64,14 +64,17 @@ export function ReopenTrendChart() {
       const daysAgo = Math.floor((now - ticketDate.getTime()) / (1000 * 60 * 60 * 24));
       const inWeek = daysAgo >= (weekIndex * 7) && daysAgo < ((weekIndex + 1) * 7);
       return inWeek && isReopened(t);
-    }).map(t => ({
-      ticketId: t.ticketId,
+    }).map(t => ({ticketId: t.ticketId,
       title: t.title,
       priority: t.priority,
       status: t.status,
       assignee: t.assignee,
       created: t.created,
-    }));
+        resolvedAt: t.resolvedAt || "-",
+        resolved: t.resolved ? t.resolved : "-",
+        createdBy: t.createdBy || "-",
+        closedBy: t.closedBy || "-"
+      }));
   }, [selectedWeek, filteredTickets, now]);
 
   return (
@@ -115,6 +118,10 @@ export function ReopenTrendChart() {
           { key: "status", label: "Status" },
           { key: "assignee", label: "Assigned To" },
           { key: "created", label: "Created" },
+          { key: "resolvedAt", label: "Resolved At" },
+          { key: "resolved", label: "Time Taken" },
+          { key: "createdBy", label: "Created By" },
+          { key: "closedBy", label: "Closed By" }
         ]}
       />
     </>

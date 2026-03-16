@@ -73,12 +73,16 @@ export function BacklogByGroupChart() {
     if (!selectedGroup) return [];
     return filteredTickets
       .filter((t) => t.assignmentGroup === selectedGroup && !["Resolved", "Closed"].includes(t.status))
-      .map(t => ({
-        ticketId: t.ticketId,
+      .map(t => ({ticketId: t.ticketId,
         title: t.title,
         priority: t.priority,
         status: t.status,
         age: t.age,
+        resolvedAt: t.resolvedAt || "-",
+        resolved: t.resolved ? t.resolved : "-",
+        createdBy: t.createdBy || "-",
+        closedBy: t.closedBy || "-",
+        assignee: t.assignee || "-"
       }));
   }, [selectedGroup, filteredTickets]);
 
@@ -149,6 +153,11 @@ export function BacklogByGroupChart() {
           { key: "priority", label: "Priority" },
           { key: "status", label: "Status" },
           { key: "age", label: "Age" },
+          { key: "resolvedAt", label: "Resolved At" },
+          { key: "resolved", label: "Time Taken" },
+          { key: "assignee", label: "Assigned To" },
+          { key: "createdBy", label: "Created By" },
+          { key: "closedBy", label: "Closed By" }
         ]}
       />
     </>

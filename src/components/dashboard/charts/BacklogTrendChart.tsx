@@ -183,6 +183,8 @@ export function BacklogTrendChart() {
           { key: "priority", label: "Priority" },
           { key: "age", label: "Age" },
           { key: "assignee", label: "Assigned To" },
+          { key: "createdBy", label: "Created By" },
+          { key: "closedBy", label: "Closed By" }
         ]}
       />
     </>
