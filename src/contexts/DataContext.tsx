@@ -51,22 +51,25 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
 
   if (!ready) {
     return (
-      <div className="min-h-screen bg-white flex flex-col items-center justify-center relative">
+      <div className="fixed inset-0 z-50 bg-white/80 backdrop-blur-sm flex flex-col items-center justify-center overflow-hidden animate-in fade-in duration-500">
         <div className="flex flex-col items-center">
           <img
             src="/src/assets/Logo.svg"
             alt="Novartis Logo"
-            className="h-24 w-24 mb-6 animate-pulse"
+            className="h-24 w-24 mb-6 animate-pulse opacity-90"
           />
-          <div className="flex flex-col items-center gap-2">
-            <span className="text-[10px] font-black text-slate-400 uppercase tracking-[0.4em] ml-[0.4em]">
-              Loading
+          <div className="flex flex-col items-center gap-3">
+            <span className="text-[11px] font-black text-slate-500 uppercase tracking-[0.5em] ml-[0.5em]">
+              Initializing Dashboard
             </span>
-            <div className="flex gap-1.5 mt-2">
-              <div className="w-1.5 h-1.5 rounded-full bg-[hsl(152,79%,20%)] animate-bounce [animation-delay:-0.3s]" />
-              <div className="w-1.5 h-1.5 rounded-full bg-[hsl(152,79%,20%)] animate-bounce [animation-delay:-0.15s]" />
-              <div className="w-1.5 h-1.5 rounded-full bg-[hsl(152,79%,20%)] animate-bounce" />
+            <div className="flex gap-2">
+              <div className="w-2 h-2 rounded-full bg-[hsl(152,79%,20%)] animate-bounce [animation-delay:-0.3s] shadow-sm" />
+              <div className="w-2 h-2 rounded-full bg-[hsl(152,79%,20%)] animate-bounce [animation-delay:-0.15s] shadow-sm" />
+              <div className="w-2 h-2 rounded-full bg-[hsl(152,79%,20%)] animate-bounce shadow-sm" />
             </div>
+            <p className="text-[10px] text-slate-400 font-medium mt-1 animate-pulse">
+              Synchronizing with ServiceNow Data...
+            </p>
           </div>
         </div>
       </div>
